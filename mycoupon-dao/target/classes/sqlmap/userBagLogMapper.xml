@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.UserBagLogMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.UserBagLogEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_user_bag_log  
+			(id, user_bag_id, type, create_time, update_time)
+		values 
+			(#{id}, #{userBagId},#{type},now(),now())
+	   </insert>
+
+</mapper>

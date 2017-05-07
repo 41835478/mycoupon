@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.CouponWordMapper">
+	
+	<select id="queryDetail" parameterType="String" resultType="com.cloudjet.coupon.entity.CouponWordEntity">
+	 	SELECT 				 
+	 		   id,
+	 		   activity_id 'activityId',
+			   word 'word'
+		FROM
+			   cp_word cw
+		WHERE
+			   cw.activity_id = #{1} and cw.word = #{0}
+	 </select>
+	
+</mapper>

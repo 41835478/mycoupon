@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoUserSourceMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.InfoUserSourceEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into info_user_source 
+			(id, info_id, type, param, way, create_time, update_time)
+		values 
+			(#{id}, #{infoId},#{type},#{param},#{way},now(),now())
+	 </insert>
+	 
+	 <select id="query" resultType="com.cloudjet.coupon.entity.InfoUserSourceEntity" parameterType="String">
+	 	select id,info_id `infoId`,type `type`,way `way` from info_user_source where info_id = #{infoId}
+	 </select>     	   
+</mapper>

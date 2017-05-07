@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.UserShareMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.UserShareEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_user_share
+			(id, share_tel, cp_id,pull_tel,type,share_time, create_time, update_time)
+		values 
+			(#{id},#{shareTel},#{cpId},#{pullTel},#{type},#{shareTime},now(),now())
+	   </insert>
+		
+</mapper>

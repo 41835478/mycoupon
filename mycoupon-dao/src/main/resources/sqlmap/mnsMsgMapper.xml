@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.MNSMsgMapper">
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.MNSMsgEntity">
+	 	
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into mns_log
+			(id, topic, producer, tag, msg_body, msg_id, count, create_time, update_time)
+		values 
+			(#{id}, #{topic}, #{producer},#{tag},#{msgBody},#{msgId},#{count},now(),now())
+	   </insert>
+</mapper>

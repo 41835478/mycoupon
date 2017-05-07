@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property resource="mq_producer.properties"/>
+	<appender name="RocketmqClientAppender"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${mq.client.logRoot}/ons.log</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>${mq.client.logRoot}/otherdays/ons.%i.log
+			</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>${mq.client.logFileMaxIndex}</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>64MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<pattern>%d{yyy-MM-dd HH:mm:ss,GMT+8} %p %t - %m%n</pattern>
+			<charset class="java.nio.charset.Charset">UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<logger name="RocketmqCommon" additivity="false">
+		<level value="${mq.client.logLevel}" />
+		<appender-ref ref="RocketmqClientAppender" />
+	</logger>
+
+
+	<logger name="RocketmqRemoting" additivity="false">
+		<level value="${mq.client.logLevel}" />
+		<appender-ref ref="RocketmqClientAppender" />
+	</logger>
+
+
+	<logger name="RocketmqClient" additivity="false">
+		<level value="${mq.client.logLevel}" />
+		<appender-ref ref="RocketmqClientAppender" />
+	</logger>
+
+
+</configuration>

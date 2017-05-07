@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoScopeMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.InfoScopeEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_info_scope 
+			(id, info_id, scope_type,param, create_time, update_time)
+		values 
+			(#{id}, #{infoId},#{scopeType},#{param},now(),now())
+	   </insert>
+	   
+	   	<delete id="delete" parameterType="String">
+			delete from cp_info_scope where info_id=#{cpId}
+		</delete>
+	   
+		<select id="queryAll" resultType="com.cloudjet.coupon.entity.InfoScopeEntity" parameterType="String">
+			SELECT info_id 'infoId',param,scope_type 'scopeType'
+			FROM cp_info_scope cis
+			WHERE cis.info_id = #{cpId}
+		</select>
+		
+		<select id="query" resultType="String" parameterType="String">
+			SELECT param
+			FROM cp_info_scope cis
+			WHERE cis.info_id = #{cpId}
+		</select>
+</mapper>

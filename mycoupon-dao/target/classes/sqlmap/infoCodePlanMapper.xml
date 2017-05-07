@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoCodePlanMapper">
+	 	
+	<insert id="add" parameterType="com.cloudjet.coupon.entity.InfoCodePlanEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_code_plan
+			(id, count, plat_code, status, cp_id, is_msg, msg_tag, shop_name, param, type, create_time, update_time)
+		values 
+			(#{id}, #{count}, #{platCode}, #{status}, #{cpId}, #{isMsg}, #{msgTag}, #{shopName}, #{param}, #{type}, now(),now())
+	</insert>
+		
+	<update id="update" parameterType="com.cloudjet.coupon.entity.InfoCodePlanEntity">
+		UPDATE cp_code_plan 
+		<set>
+			<if test=" platCode !=null and platCode !=''">
+				plat_code = #{platCode},
+			</if>
+			<if test=" status !=null ">
+				status = #{status},
+			</if>
+			<if test=" cpId !=null and cpId !=''">
+				cp_id = #{cpId},
+			</if>
+			<if test=" msgTemplate !=null ">
+				msg_template = #{msgTemplate},
+			</if>
+			<if test=" msgUrl !=null ">
+				msg_url = #{msgUrl},
+			</if>
+			<if test=" param !=null ">
+				param = #{param},
+			</if>
+			<if test=" msgTag !=null and msgTag !=''">
+				msg_tag = #{msgTag},
+			</if>
+				update_time = now()
+		</set>
+		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from cp_code_plan
+		where id = #{codePlanId}
+	</delete>
+	
+	<update id="unbind">
+		update cp_code_plan set cp_Id= NULL,status = '0',update_time = now()
+		where id = #{codePlanId}
+	</update>
+	
+	<select id="query" resultType="com.cloudjet.coupon.entity.InfoCodePlanEntity">
+		select id,count,plat_code 'platCode',`status`,cp_id 'cpId',is_msg 'isMsg',shop_name 'shopName', param,
+			   create_time 'createTime',update_time 'updateTime',msg_url 'msgUrl',msg_template 'msgTemplate', msg_tag 'msgTag'
+		from cp_code_plan
+		where id = #{codePlanId}
+	</select>
+		
+	<update id="updateMsgStatus">
+		update cp_code_plan set is_msg = #{isMsg},update_time = now()
+		where id = #{codePlanId}
+	</update>
+	
+	<select id="queryCodeList" resultType="com.cloudjet.coupon.entity.dto.CodeListEntity">
+		SELECT ccp.id,ccp.plat_code 'platCode',ccp.count,ccp.`status` 'codePlanStatus',
+		ccp.is_msg 'isMsg',ccp.msg_tag `msgTag`,ccp.shop_name 'shopName',
+			   ccp.create_time 'createTime',ccp.cp_id 'cpId', ccp.type, ci.cp_name 'cpName'
+		FROM cp_code_plan ccp
+		LEFT JOIN cp_info ci ON ccp.cp_id = ci.id
+		WHERE 1=1 
+			<if test="platCode != null and platCode != ''">
+				and ccp.plat_code = #{platCode}
+			</if>
+			<if test="codePlanStatus != null">
+				and ccp.status = #{codePlanStatus}
+			</if>
+		ORDER BY ccp.create_time desc
+		<if test="start !=null and limit !=null">
+			LIMIT ${start},${limit}
+		</if>
+	</select>
+	
+	<select id="queryCodeListCount" resultType="int">
+		SELECT count(1)
+		FROM cp_code_plan ccp
+		LEFT JOIN cp_info ci ON ccp.cp_id = ci.id
+		WHERE 1=1 
+			<if test="platCode != null and platCode != ''">
+				and ccp.plat_code = #{platCode}
+			</if>
+			<if test="codePlanStatus != null">
+				and ccp.status = #{codePlanStatus}
+			</if>
+	</select>
+</mapper>

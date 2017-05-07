@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoUserSourceDetailMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.InfoUserSourceDetailEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into info_user_source_detail 
+			(id, user_source_id, tel, create_time, update_time)
+		values 
+			(#{id}, #{userSourceId},#{tel},now(),now())
+	   </insert>
+	   	   
+
+	 <insert id="batchSave" parameterType="java.util.List">
+		insert into info_user_source_detail
+				(id, user_source_id, tel, create_time, update_time)
+		values
+		<foreach collection="infoUserSourceDetailEntitys" item="item" index="index" separator="," >  
+        	(#{item.id}, #{item.userSourceId},#{item.tel},now(),now())
+    	</foreach> 
+			
+	 </insert>
+	 
+	 <select id="queryUserByTel" resultType="String">
+			
+		SELECT tel 
+			FROM info_user_source_detail iusd
+			left join info_user_source ius on ius.id = iusd.user_source_id
+			WHERE iusd.tel = #{userTel} and ius.info_id = #{cpId}
+	 </select>
+	 
+
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.ProductSortRelationMapper">
+	 
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.ProductSortRelationEntity">
+	 	
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+			insert into cp_product_sort_relation
+			(id, product_id, sort_id, create_time, update_time)
+		values 
+			(#{id}, #{productId}, #{sortId}, now(), now())
+	   </insert>
+
+	<delete id="delete">
+		delete from cp_product_sort_relation
+		where sort_id = #{sortId}
+	</delete>
+	
+	<select id="query" resultType="com.cloudjet.coupon.entity.ProductSortRelationEntity">
+		select product_id 'productId', sort_id 'sortId'
+		from cp_product_sort_relation
+		where sort_id = #{sortId}
+	</select>
+</mapper>

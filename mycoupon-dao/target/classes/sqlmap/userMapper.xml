@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.UserMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.UserEntity">
+	 	
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into user 
+			(id, user_name, password, create_time, update_time)
+		values 
+			(#{id}, #{userName},#{password},now(),now())
+	   </insert>
+</mapper>

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.UserBagMapper">
+
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.UserBagEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_user_bag 
+			(id, user_tel, info_id, status,create_time,update_time)
+		values 
+			(#{id}, #{userTel},#{infoId},#{status},now(),now())
+	   </insert>
+	   
+	 <insert id="batchSave" parameterType="java.util.List">
+		insert into cp_user_bag 
+				(id, user_tel, info_id, status,create_time,update_time)
+		values
+		<foreach collection="userBagEntitys" item="item" index="index" separator="," >  
+        	(#{item.id}, #{item.userTel},#{item.infoId},#{item.status},now(),now())
+    	</foreach> 
+	 </insert>	   
+
+	 <select id="selectByCouponId" parameterType="String" resultType="com.cloudjet.coupon.entity.UserBagEntity">
+	 	SELECT 				 
+	 		   id,
+	 		   user_tel 'userTel',
+			   info_id 'infoId',
+			   status 
+		FROM
+			   cp_user_bag
+		WHERE
+			   info_id = #{cpId}
+	 </select>
+	
+	<select id="countSingel" resultType="int">
+		select count(id) from cp_user_bag where info_id=#{cpId} and user_tel=#{userTel}
+	</select>
+	
+	
+	<select id="findTotal" resultType="int">
+		SELECT count(cub.id)
+		from cp_user_bag cub
+		left join cp_code cc on cc.user_bag_id = cub.id 
+		left join cp_info ci on ci.id = cub.info_id
+		left join cp_shop_info csi on csi.info_id = ci.id
+		left join cp_info_condition cic on cic.info_id = ci.id
+		where 1 = 1
+		<if test="tel != null || tel != ''">
+			and cub.user_tel = #{tel}
+		</if>
+		<if test="costType != null || costType != ''">
+			and ci.cost_type = #{costType}
+		</if>
+			and csi.plat_code = #{platCode}
+			and ci.due_time &gt; now() and cub.status = 0
+	</select>
+	
+	<select id="queryBags" resultType="com.cloudjet.coupon.entity.dto.UserBagFindEntity">
+		SELECT cc.cp_code `cpCode`, cub.id `userBagId`,ci.id `cpId`,ci.cp_name `cpName`,
+			ci.due_time `dueTime`,ci.begin_time `beginTime`,ci.memo,ci.type `couponType`,
+			ci.rule `rule`,ci.rich_text `richText`,ci.url `url`,ci.url_button `urlButton`,
+			ci.is_code `isCode`,ci.is_meantime `meantime`,ci.is_meanwhile `meanwhile`,
+			cic.type, cic.id `conditionId`,cic.par,cic.start_fee `startFee`,cic.end_fee `endFee`
+		from cp_user_bag cub
+		left join cp_code cc on cc.user_bag_id = cub.id 
+		left join cp_info ci on ci.id = cub.info_id
+		left join cp_shop_info csi on csi.info_id = ci.id
+		left join cp_info_condition cic on cic.info_id = ci.id
+		where 1 = 1
+		<if test="tel != null || tel != ''">
+			and cub.user_tel = #{tel}
+		</if>
+			
+		<if test="costType != null || costType != ''">
+			and ci.cost_type = #{costType}
+		</if>
+		and csi.plat_code = #{platCode}
+		and ci.due_time &gt; now() and cub.status = 0
+		 order by cub.create_time desc
+		<if test="start != null">
+		 	limit ${start},${limit}
+		 </if>
+	</select>
+
+	<select id="findUserBags" parameterType="String" resultType="com.cloudjet.coupon.entity.UserBagEntity">
+		SELECT 
+			cub.id,cub.user_tel 'userTel',cub.info_Id 'infoId',status
+		FROM cp_user_bag cub
+		LEFT JOIN cp_user_bag_order cubo ON cub.id = cubo.user_bag_id
+		WHERE 
+			cubo.order_no = #{orderNo}
+	 </select>
+
+	<update id="update" >
+		update cp_user_bag 
+			set
+		 		update_time = now(),
+				status = #{status}
+		where id = #{id}
+	</update>
+		
+	<select id="queryBagDetail" resultType="com.cloudjet.coupon.entity.dto.UserBagFindEntity">
+		SELECT cub.id `userBagId`,ci.id `cpId`,ci.cp_name `cpName`,ci.due_time `dueTime`,ci.begin_time `beginTime`,
+			ci.memo,ci.type `couponType`,ci.rule `rule`,ci.is_meanwhile `meanwhile`,
+			cic.type, cic.id `conditionId`,cic.par,cic.start_fee `startFee`,cic.end_fee `endFee`
+		from cp_user_bag cub 
+		left join cp_info ci on ci.id = cub.info_id
+		left join cp_info_condition cic on cic.info_id = ci.id
+		where cub.id= #{userBagId}
+	</select>	
+	
+	<select id="findUserBagRes" resultType="com.cloudjet.coupon.entity.dto.UserBagResEntity">
+		SELECT cub.id 'userBagId',cub.`status`,cub.create_time 'createTime',ccm.`status` 'msgStatus',
+			 ci.id 'cpId',ci.cp_name 'cpName',ci.is_code 'isCode',ci.is_bind_code 'isBindCode',
+			 ci.begin_time 'beginTime',ci.due_time 'dueTime',ccp.is_msg 'isMsg',cco.cp_code 'code'
+		FROM cp_user_bag cub
+		LEFT JOIN cp_info ci ON cub.info_id = ci.id
+		LEFT JOIN cp_code cco ON cub.id = cco.user_bag_id
+		LEFT JOIN cp_code_plan ccp ON cco.code_plan_id =  ccp.id
+		LEFT JOIN cp_code_msgTag ccm ON cco.cp_code = ccm.cp_code
+		<where>
+			<if test="tel != null and tel !=''">
+				and cub.user_tel = #{tel}
+			</if>
+			<if test="cpName != null and cpName !=''">
+				and ci.cp_name = #{cpName}
+			</if>
+		</where>		
+	</select>
+
+	<select id="queryCoupon" resultType="com.cloudjet.coupon.entity.dto.CouponInfoDetailEntity">
+		SELECT 
+			ci.id 'cpId',ci.cp_name 'cpName',ci.pre_way 'preWay',ci.check_no 'checkNo',
+			ci.start_time 'startTime',ci.end_time 'endTime',ci.circulation 'circulation',
+			ci.stock 'stock',ci.limit_num 'limitNum',ci.begin_time 'beginTime',ci.due_time 'dueTime',
+			ci.type 'type',ci.status 'status',ci.user_source_type 'userSourceType',ci.cost_type 'costType',
+			ci.is_code 'isCode',ci.is_bind_code 'isBindCode',ci.is_share `isShare`,ci.rule 'rule',ci.memo 'memo',
+			ci.rich_text 'richText',ci.url 'url',ci.url_button 'urlButton',ci.is_meanwhile `meanwhile`,
+			ci.create_time 'createTime',ci.update_time 'updateTime',
+			cp.type 'conditionType',cp.start_fee 'startFee',cp.par 'par',cp.end_fee 'endFee',
+			ccp.type 'codeType'
+		FROM cp_user_bag cub
+		LEFT JOIN cp_info ci ON cub.info_id = ci.id
+		LEFT JOIN cp_info_condition cp ON ci.id=cp.info_id
+		LEFT JOIN cp_code cc ON cub.id = cc.user_bag_id
+		LEFT JOIN cp_code_plan ccp ON cc.code_plan_id = ccp.id
+		WHERE cub.id = #{userBagId} and cub.user_tel = #{tel}
+	</select>
+	
+	<select id="getNoUsed" resultType="com.cloudjet.coupon.entity.UserBagEntity">
+		select * from cp_user_bag cub where
+			cub.info_id = #{cpId} 
+			and cub.user_tel = #{tel} 
+			and cub.status = 0 LIMIT 1;
+	</select>
+	
+	
+		
+</mapper>

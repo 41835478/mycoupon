@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.ProductMapper">
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.ProductEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_product
+			(id, shop_code, product_id, product_name, shop_name, create_time, update_time)
+		values 
+			(#{id}, #{shopCode}, #{productId}, #{productName}, #{shopName}, now(), now())
+	   </insert>
+
+	<delete id="delete">
+		delete from cp_product
+		where product_id = #{productId} and shop_code = #{shopCode}
+	</delete>
+	
+	<select id="query" resultType="com.cloudjet.coupon.entity.ProductEntity">
+		select id, shop_code 'shopCode', product_id 'productId', product_name 'productName', 
+				shop_name 'shopName', create_time 'createTime', update_time 'updateTime'
+		from cp_product
+		where product_id = #{productId} and shop_code = #{shopCode}
+	</select>
+	
+	<select id="queryShopProduct" resultType="com.cloudjet.coupon.entity.ProductEntity">
+		select id, shop_code 'shopCode', product_id 'productId', product_name 'productName', 
+				shop_name 'shopName', create_time 'createTime', update_time 'updateTime'
+		from cp_product
+		<where>
+			<if test="shopCode !=null and shopCode !=''">
+				and shop_code = #{shopCode}
+			</if>
+			<if test="productName !=null and productName !=''">
+				and product_name like '%${productName}%'
+			</if>
+			<if test="shopName !=null and shopName !=''">
+				and shop_name like '%${shopName}%'
+			</if>
+		</where> 
+		<if test="limit !=null and start !=null">
+			limit ${start},${limit}
+		</if>
+	</select>
+	
+	<select id="queryCount" resultType="Integer">
+		select count(1)
+		from cp_product
+		<where>
+			<if test="shopCode !=null and shopCode !=''">
+				and shop_code = #{shopCode}
+			</if>
+			<if test="productName !=null and productName !=''">
+				and product_name like '%${productName}%'
+			</if>
+			<if test="shopName !=null and shopName !=''">
+				and shop_name like '%${shopName}%'
+			</if>
+		</where> 
+	</select>
+
+</mapper>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.CouponConvertUserMapper">
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.CouponConvertUserEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_convert_user  
+			(id, code_id, user_bag_id, create_time, update_time)
+		values 
+			(#{id}, #{codeId}, #{userBagId}, now(), now())
+	 </insert>
+	 
+	 <select id="queryCodeUser" resultType="com.cloudjet.coupon.entity.CouponConvertUserEntity">
+	 	SELECT ccu.id, ccu.code_id, ccu.user_bag_id, ccu.create_time, ccu.update_time
+	 	FROM cp_convert_user ccu
+	 	LEFT JOIN cp_convert_code ccc ON ccu.code_id = ccc.id
+	 	LEFT JOIN cp_convert_plan ccp ON ccc.convert_id = ccp.id
+	 	WHERE ccp.id = #{convertId}
+	 </select>
+	 
+</mapper>

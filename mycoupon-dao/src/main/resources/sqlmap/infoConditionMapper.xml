@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoConditionMapper">
+	<insert id="add" parameterType="com.cloudjet.coupon.entity.InfoConditionEntity">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into cp_info_condition
+		(id, info_id, type, par, end_fee, start_fee, create_time, update_time)
+		values
+		(#{id}, #{infoId},#{type},#{par},#{endFee},#{startFee},now(),now())
+	</insert>
+	<delete id="delete" parameterType="String">
+		delete from cp_info_condition where info_id=#{cpId}
+	</delete>
+		
+</mapper>

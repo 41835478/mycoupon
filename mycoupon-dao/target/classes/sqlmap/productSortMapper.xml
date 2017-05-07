@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.ProductSortMapper">
+	 
+	<insert id="save" parameterType="com.cloudjet.coupon.entity.ProductSortEntity">
+	 	
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_product_sort
+			(id, shop_code, name, create_time, update_time)
+		values 
+			(#{id}, #{shopCode}, #{name}, now(), now())
+	</insert>
+	
+	<select id="query" resultType="com.cloudjet.coupon.entity.ProductSortEntity">
+		select id, shop_code 'shopCode', name
+		from cp_product_sort
+		where shop_code = #{shopCode}
+	</select>
+	
+	<select id="queryList" parameterType="java.util.Map" resultType="com.cloudjet.coupon.entity.ProductSortEntity">
+		select id, shop_code 'shopCode', name
+		from cp_product_sort
+		where shop_code = #{shopCode}
+		<if test="name != null and name !=''">
+			and name like '%${name}%'
+		</if>	
+		<if test="start != null and limit != null">
+			limit ${start},${limit}
+		</if>	
+	</select>
+		
+	<select id="queryCount" parameterType="java.util.Map" resultType="Integer">
+		select count(1)
+		from cp_product_sort
+		where shop_code = #{shopCode}	
+		<if test="name != null and name !=''">
+			and name like '%${name}%'
+		</if>	
+	</select>
+
+	<delete id="delete">
+		delete from cp_product_sort
+		where id = #{sortId}
+	</delete>
+	
+	<select id="queryProducts" resultType="com.cloudjet.coupon.entity.dto.ProductDetailEntity">
+		SELECT 
+			cps.id 'sortId', cps.name, cps.shop_code 'shopCode',
+			cpsr.product_id 'productId'	 
+		FROM cp_product_sort cps 
+		LEFT JOIN cp_product_sort_relation cpsr ON cps.id = cpsr.sort_id
+		WHERE cps.id = #{sortId}
+	</select>
+	
+	<update id="update">
+		<if test="name !=null and name!='' ">
+			update cp_product_sort set name = #{name}, update_time = now()
+			where id = #{sortId}
+		</if>	
+	</update>
+	
+	<select id="queryByProductId" resultType="com.cloudjet.coupon.entity.dto.ProductDetailEntity">
+		select 
+			cps.id 'sortId', cps.name, cps.shop_code 'shopCode',
+			cpsr.product_id 'productId'	 
+ 			from cp_product_sort_relation cpsr 
+			left JOIN cp_product_sort cps on cps.id = cpsr.sort_id
+		where cpsr.product_id = #{productId} and cps.shop_code = #{shopCode}
+	</select>
+	
+	<select id="querySortDetail" resultType="com.cloudjet.coupon.entity.ProductSortEntity">
+		SELECT
+			id,shop_code 'shopCode',`name`,create_time 'createTime',update_time 'updateTime'
+		FROM
+			cp_product_sort
+		WHERE 
+			id = #{sortId}
+	</select>
+</mapper>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.JphUserMapper">
+	   
+	   	<select id="selectTels" parameterType="int" resultType="java.lang.String">
+			select tel from jph_user where level in
+				<foreach item="item" index="index" collection="levels" 
+                         open="(" separator="," close=")">
+                        #{item}
+                </foreach>
+		</select>
+		
+		<select id="selectCount" resultType="int" parameterType="String">
+		SELECT COUNT(1)
+		FROM jph_user
+		WHERE `level` in (
+			SELECT `level`
+			from info_user_source_level iusl
+			LEFT JOIN info_user_source ius ON iusl.user_source_id = ius.id
+			LEFT JOIN cp_info ci ON ius.info_id = ci.id
+			WHERE ci.id = #{cpId}
+		);
+		</select>
+		
+	   <select id="queryJphLevel" resultType="String">
+		   	SELECT LEVEL 
+			FROM jph_user
+			WHERE tel = #{userTel}
+	   </select>
+	   		
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.CouponPackageMapper">
+	<insert id="add" parameterType="com.cloudjet.coupon.entity.CouponPackageEntity">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+
+		insert into cp_package
+		(id, name, plat_code, shop_name, is_share, status, start_time, end_time, rich_text, channel_text, create_time, update_time)
+		values
+		(#{id}, #{name}, #{platCode}, #{shopName}, #{isShare}, #{status}, #{startTime}, #{endTime}, #{richText}, #{channelText}, now(), now())
+	</insert>
+
+	<update id="updateStatus">
+		UPDATE cp_package SET status = #{status},update_time = NOW()
+		WHERE id = #{packageId}
+	</update>
+
+	<delete id="delete">
+		delete from cp_package
+		where id = #{packageId}
+	</delete>
+
+	<select id="query" resultType="com.cloudjet.coupon.entity.CouponPackageEntity">
+		select id,name,status,start_time 'startTime', end_time 'endTime',plat_code 'platCode',is_share 'isShare',
+			   shop_name 'shopName', rich_text 'richText' , channel_text 'channelText'
+		from cp_package
+		where id = #{packageId}
+	</select>
+		
+	<select id="queryPackageList" resultType="com.cloudjet.coupon.entity.CouponPackageEntity">
+		SELECT cp.id,name,status,start_time 'startTime', end_time 'endTime', channel_text 'channelText',
+			   plat_code 'platCode',is_share 'isShare',shop_name 'shopName', rich_text 'richText'
+		FROM cp_package cp
+		<where>
+			<if test="name != null and name != ''">
+				and cp.name like '%${name}%'
+			</if>
+			<if test="status != null">
+				and cp.status = #{status}
+			</if>
+			<if test="platCode != null">
+				and cp.plat_code = #{platCode}
+			</if>
+		</where>
+		ORDER BY cp.create_time desc
+		<if test="start !=null and limit !=null">
+			LIMIT ${start},${limit}
+		</if>
+	</select>
+	
+	<select id="queryPackageListCount" resultType="int">
+		SELECT count(1)
+		FROM cp_package cp
+		<where>
+			<if test="name != null and name != ''">
+				and cp.name like '%${name}%'
+			</if>
+			<if test="status != null">
+				and cp.status = #{status}
+			</if>
+			<if test="platCode != null">
+				and cp.plat_code = #{platCode}
+			</if>
+		</where>
+	</select>
+	
+		
+	<update id="updatePackage">
+		UPDATE cp_package
+		<set>
+			<if test="name != '' and name != null">
+				name = #{name},
+			</if>
+			<if test="isShare != null">
+				is_share = #{isShare},
+			</if>
+			<if test="startTime != null">
+				start_time = #{startTime},
+			</if>
+			<if test="endTime != null">
+				end_time = #{endTime},
+			</if>
+			<if test="platCode !='' and platCode != null">
+				plat_code = #{platCode},
+			</if>
+			<if test="shopName !='' and shopName != null">
+				shop_name = #{shopName},
+			</if>
+			<if test="richText !='' and richText != null">
+				rich_text = #{richText},
+			</if>
+			<if test="channelText !='' and channelText != null">
+				channel_text = #{channelText},
+			</if>
+				update_time = now()
+		</set>
+		WHERE
+		 	id = #{packageId}
+	</update>
+</mapper>

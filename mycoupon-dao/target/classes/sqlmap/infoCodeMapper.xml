@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoCodeMapper">
+	 	
+	<insert id="add" parameterType="com.cloudjet.coupon.entity.InfoCodeEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_code
+			(id,user_bag_id,cp_code,code_plan_id,status,create_time, update_time)
+		values 
+			(#{id},#{userBagId}, #{cpCode},#{codePlanId},#{status},now(),now())
+	</insert>
+		
+	<select id="queryDistinct" parameterType="String" resultType="com.cloudjet.coupon.entity.InfoCodeEntity">
+		SELECT cc.id,cc.user_bag_id 'userBagId',cc.cp_code 'cpCode',cc.code_plan_id 'codePlanId',
+		       cc.status,cc.create_time 'createTime',cc.update_time 'updateTime'
+		FROM cp_code cc
+		LEFT JOIN cp_code_plan ccp ON cc.code_plan_id = ccp.id
+		WHERE ccp.plat_code = #{platCode} AND cc.cp_code = #{infoCode}
+	</select>
+	
+	<select id="queryCodeId" parameterType="String" resultType="com.cloudjet.coupon.entity.InfoCodeEntity">
+		select cc.id,cc.user_bag_id 'userBagId',cc.cp_code 'cpCode',
+		cc.code_plan_id 'codePlanId',cc.status,cc.create_time 'createTime',cc.update_time 'updateTime' 
+		from cp_code cc
+			left join cp_code_plan ccp on ccp.id = cc.code_plan_id
+			left join cp_info ci on ci.id = ccp.cp_id
+				where ci.id = #{0}
+				and cc.status = 0
+		limit 1
+	</select>
+	
+	<select id="queryCodeMsg" parameterType="String" resultType="com.cloudjet.coupon.entity.dto.InfoCodeMsgEntity">
+		select cc.id,cc.user_bag_id 'userBagId',cc.cp_code 'cpCode',
+		cc.code_plan_id 'codePlanId',cc.status,cc.create_time 'createTime',cc.update_time 'updateTime',
+		ccp.is_msg 'isMsg'
+		from cp_code cc
+			left join cp_code_plan ccp on ccp.id = cc.code_plan_id
+			left join cp_info ci on ci.id = ccp.cp_id
+				where ci.id = #{0}
+				and cc.status = 0
+		limit 1
+	</select>
+	
+	<update id="bindBagId" parameterType="String">
+		update cp_code  set user_bag_id = #{0},status = 1 where id = #{1}; 
+	</update> 
+	
+	<delete id="delete">
+		delete from cp_code
+		where code_plan_id = #{codePlanId}
+	</delete>
+	
+</mapper>

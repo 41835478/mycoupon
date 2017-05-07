@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.UserBagOrderMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.UserBagOrderEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_user_bag_order
+			(id, order_no, user_bag_id, create_time, update_time)
+		values 
+			(#{id}, #{orderNo},#{userBagId},now(),now())
+	   </insert>
+
+
+</mapper>

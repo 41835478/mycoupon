@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoUserSourceLevelMapper">
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.InfoUserSourceLevelEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into info_user_source_level 
+			(id, user_source_id, level, create_time, update_time)
+		values 
+			(#{id}, #{userSourceId},#{level},now(),now())
+	   </insert>
+	   	   
+
+	   <insert id="batchSave" parameterType="java.util.List">
+			insert into info_user_source_level
+					(id, user_source_id, level, create_time, update_time)
+			values
+			<foreach collection="infoUserSourceLevelEntitys" item="item" index="index" separator="," >  
+        		(#{item.id}, #{item.userSourceId},#{item.level},now(),now())  
+    		</foreach> 
+			
+	   </insert>
+	   
+	   <select id="queryLevels" resultType="String" >
+			SELECT level 
+			FROM info_user_source_level iusl
+			LEFT JOIN info_user_source ius ON iusl.user_source_id = ius.id
+			WHERE ius.info_id = #{cpId}
+	   </select>	
+
+</mapper>

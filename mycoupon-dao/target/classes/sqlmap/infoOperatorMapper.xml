@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoOperatorMapper">
+	 
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.InfoOperatorEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_info_operator  
+			(id, info_id, operator_id,operator_name,operator_tel,type,create_time, update_time)
+		values 
+			(#{id}, #{infoId},#{operatorId},#{operatorName},#{operatorTel},#{type},now(),now())
+	   </insert>
+	   	   
+</mapper>

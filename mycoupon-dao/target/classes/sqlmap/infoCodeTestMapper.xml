@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.InfoCodeTestMapper">
+	<insert id="save" parameterType="com.cloudjet.coupon.entity.InfoCodeTestEntity">
+		<selectKey keyProperty="id" resultType="String" order="BEFORE">
+			select replace(uuid(),'-','') from dual
+		</selectKey>
+		insert into cp_code_test
+		(id, tel, code_plan_id, create_time, update_time)
+		values
+		(#{id}, #{tel}, #{codePlanId}, now(), now())
+	</insert>
+		
+	<select id="queryCount" parameterType="java.util.Map" resultType="int">
+		select count(1) from cp_code_test
+		where code_plan_id = #{0}
+	</select>
+	
+</mapper>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.CouponConvertCodeMapper">
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.CouponConvertCodeEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_convert_code  
+			(id, code, convert_id, status, create_time, update_time)
+		values 
+			(#{id}, #{code}, #{convertId}, #{status}, now(), now())
+	 </insert>
+	 
+	  <select id="queryCoupon" resultType="com.cloudjet.coupon.entity.dto.CouponInfoDetailEntity">
+		SELECT 
+			ci.id 'cpId',ci.cp_name 'cpName',ci.pre_way 'preWay',ci.check_no 'checkNo',
+			ci.start_time 'startTime',ci.end_time 'endTime',ci.circulation 'circulation',
+			ci.stock 'stock',ci.limit_num 'limitNum',ci.begin_time 'beginTime',ci.due_time 'dueTime',
+			ci.type 'type',ci.status 'status',ci.user_source_type 'userSourceType',ci.cost_type 'costType',
+			ci.is_code 'isCode',ci.is_bind_code 'isBindCode',ci.rule 'rule',ci.memo 'memo',
+			ci.rich_text 'richText',ci.url 'url',ci.url_button 'urlButton',
+			ci.create_time 'createTime',ci.update_time 'updateTime',
+			cic.type 'conditionType',cic.start_fee 'startFee',cic.par 'par',cic.end_fee 'endFee'
+		FROM  cp_convert_code ccc
+		LEFT JOIN cp_convert_plan ccp ON ccc.convert_id = ccp.id
+		LEFT JOIN cp_info ci on ccp.info_id = ci.id
+		LEFT JOIN cp_info_condition cic ON ci.id = cic.info_id
+		WHERE ccc.`code`= #{code}
+	  </select>
+	  
+	  <select id="query" resultType="com.cloudjet.coupon.entity.dto.ConvertCodeDetailEntity">
+	 	 SELECT ccc.id, code, ccc.convert_id 'convertId', ccc.`status` , ccp.type,
+			 ccp.count, ccp.info_id 'infoId' , ccc.create_time 'createTime' ,ccc.update_time 'updateTime' 
+		FROM cp_convert_code ccc
+		LEFT JOIN cp_convert_plan ccp ON ccc.convert_id = ccp.id
+		WHERE `code` = #{code} 
+	  </select>
+	  
+	  <update id="updateCode">
+	  	UPDATE cp_convert_code 
+		SET `status` = 1 , update_time = now()
+		WHERE `code` = #{code}
+	  </update>
+	  
+	  <delete id="delete">
+		DELETE FROM cp_convert_code
+		WHERE convert_id = #{convertPlanId}
+	 </delete>
+	 
+	 <select id="queryPackage" resultType="com.cloudjet.coupon.entity.CouponPackageEntity">
+	 	SELECT cp.id, cp.name, cp.status, cp.start_time 'startTime', cp.end_time 'endTime',
+					 cp.plat_code 'platCode', cp.is_share 'isShare',cp.shop_name 'shopName'
+		FROM cp_convert_code ccc
+		LEFT JOIN cp_convert_plan ccp ON ccc.convert_id = ccp.id
+		LEFT JOIN cp_package cp ON ccp.info_id = cp.id
+		WHERE ccc.`code` = #{code} 
+	 </select>
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.SendRecordMapper">
+	 
+	 <insert id="add" parameterType="com.cloudjet.coupon.entity.SendRecordEntity">
+	 	
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_send_record
+			(id, info_id, type, user_scope, count, info_operator_id, create_time, update_time)
+		values 
+			(#{id}, #{infoId}, #{type}, #{userScope}, #{count}, #{infoOperatorId},now(),now())
+	   </insert>
+
+		<select id="sendRecordDetail" parameterType="String" resultType="com.cloudjet.coupon.entity.dto.SendRecordDeatilEntity">
+			SELECT csr.type 'sendType',csr.user_scope 'userSouceType',csr.count,
+				   cio.id 'operatorId',cio.operator_name 'operatorName',cio.operator_tel 'operatorTel',cio.create_time 'createTime'		
+			FROM cp_send_record csr
+			LEFT JOIN cp_info_operator cio ON csr.info_operator_id = cio.id
+			WHERE  cio.info_id = #{cpId} and cio.type in (4,6)
+		</select>
+
+</mapper>

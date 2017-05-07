@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cloudjet.coupon.mapper.ProductLogMapper">
+	 <insert id="save" parameterType="com.cloudjet.coupon.entity.ProductLogEntity">
+	 	<selectKey keyProperty="id" resultType="String" order="BEFORE">  
+       		 select  replace(uuid(),'-','')   from dual  
+   		</selectKey>
+	 	
+		insert into cp_product_log
+			(id, shop_code, product_id, type, product_name, shop_name, create_time, update_time)
+		values 
+			(#{id}, #{shopCode}, #{productId}, #{type}, #{productName}, #{shopName}, now(), now())
+	   </insert>
+
+</mapper>
